@@ -1,133 +1,69 @@
 import tkinter as tk
-from tkinter import messagebox
-from DQLAgent import DQLAgent
-from DDQLAgent import DDQLAgent
-from TicTacToe import TicTacToe
+from GymTTT import GymTTT
+from QLearningAgent import QLearningAgent
 
-tf.get_logger().setLevel('ERROR')
 
 class TicTacToeGUI:
-    def __init__(self):
-        self.game = TicTacToe()
+    def __init__(self, agent):
+        self.root = tk.Tk()
+        self.root.title("Tic Tac Toe")
+        self.gym = GymTTT(agent, verbose=True)
 
-        self.root = tk.Tk()  # Inicialize isso primeiro!
-        self.root.title("Jogo da Velha - IA")
+        self.buttons = [[None, None, None] for _ in range(3)]
 
-        self.agent_type = tk.StringVar()  # Em seguida, inicialize as variáveis tkinter
-        self.agent_type.set("Heurístico")
+        for i in range(3):
+            for j in range(3):
+                self.buttons[i][j] = tk.Button(
+                    self.root,
+                    text=" ",
+                    font=("normal", 20),
+                    command=lambda i=i, j=j: self.on_button_click(i, j),
+                )
+                self.buttons[i][j].grid(row=i, column=j, sticky="nsew")
 
-        self.buttons = [
-            tk.Button(
-                self.root,
-                text="",
-                width=20,
-                height=3,
-                command=lambda i=i: self.player_move(i),
-            )
-            for i in range(9)
-        ]
-        for i, btn in enumerate(self.buttons):
-            row, col = divmod(i, 3)
-            btn.grid(row=row, column=col)
 
-        self.label = tk.Label(self.root, text="Escolha o agente:")
-        self.label.grid(row=3, column=0, columnspan=3)
-
-        self.choices = ["DQL", "DDQL", "Heurístico"]
-        self.dropdown = tk.OptionMenu(self.root, self.agent_type, *self.choices)
-        self.dropdown.grid(row=4, column=0, columnspan=3)
-
-        # Adicionando um dropdown para selecionar a dificuldade
-        self.difficulty_label = tk.Label(self.root, text="Dificuldade:")
-        self.difficulty_label.grid(row=6, column=0, columnspan=3)
-        self.difficulty_var = tk.StringVar()
-        self.difficulty_var.set("Fácil")
-        self.difficulties = ["Fácil", "Normal", "Difícil"]
-        self.difficulty_dropdown = tk.OptionMenu(
-            self.root, self.difficulty_var, *self.difficulties
+        self.reset_button = tk.Button(
+            self.root, text="Reset", command=self.reset_game
         )
-        self.difficulty_dropdown.grid(row=7, column=0, columnspan=3)
+        self.reset_button.grid(row=3, column=1)
 
-        # Atualiza a visibilidade da opção de dificuldade dependendo da seleção do tipo de agente
-        self.agent_type.trace_add("write", self.update_difficulty_visibility)
-        self.update_difficulty_visibility()
+        self.reset_game()
 
-        self.restart_button = tk.Button(
-            self.root, text="Reiniciar", command=self.restart_game
-        )
-        self.restart_button.grid(row=5, column=0, columnspan=3)
+    def on_button_click(self, row, col):
+        action = (row, col)
+        print(f"Human Move: {action}")
+        time_step = self.gym.step(action)
 
-    def update_difficulty_visibility(self, *args):
-        if self.agent_type.get() == "Heurístico":
-            self.difficulty_label.grid_remove()
-            self.difficulty_dropdown.grid_remove()
-        else:
-            self.difficulty_label.grid()
-            self.difficulty_dropdown.grid()
+        self.update_board(time_step.observation)
+        
 
-    def player_move(self, index):
-        if self.game.board[index] == 0:
-            self.buttons[index].config(text="X")
-            self.game.board[index] = 1
+    def reset_game(self):
+        time_step = self.gym.reset()
+        self.update_board(time_step.observation)
 
-            if not self.game.check_win(1):
-                self.agent_move()
-            elif len(self.game.available_actions()) == 0:
-                messagebox.showinfo("Resultado", "Empate!")
-                self.restart_game()
-            else:
-                messagebox.showinfo("Resultado", "Você venceu!")
-                self.restart_game()
+    def update_board(self, board):
+        symbols = {0: " ", 1: "X", 2: "O"}
 
-    def agent_move(self):
-        # Adicionando feedback visual
-        # self.feedback_label.config(text="Pensando...")
-        self.root.update_idletasks()  # força a atualização da GUI
+        for i in range(3):
+            for j in range(3):
+                self.buttons[i][j].config(text=symbols[board[i][j]])
 
-        difficulty = self.difficulty_var.get()
 
-        if self.agent_type.get() == "DQL":
-            agent = DQLAgent(9, 9, self.game, epsilon=0.0)
-            if difficulty == "Fácil":
-                agent.load("./dql_agent/difficult/easy")
-            elif difficulty == "Normal":
-                agent.load("./dql_agent/difficult/normal")
-            else:
-                agent.load("./dql_agent/difficult/hard")
-            action = agent.act(self.game.board)
-            self.game.board[action] = -1
-        elif self.agent_type.get() == "DDQL":
-            agent = DDQLAgent(9, 9, self.game)
-            if difficulty == "Fácil":
-                agent.load("./path_to_ddql_model_10/")
-            elif difficulty == "Normal":
-                agent.load("./path_to_ddql_model_100/")
-            else:
-                agent.load("./path_to_ddql_model_150/")
-            action = agent.act(self.game.board)
-            self.game.board[action] = -1
-        else:
-            action, _ = self.game.heuristic_play(-1)
-
-        # self.feedback_label.config(text="")  # remove o feedback
-        self.buttons[action].config(text="O")
-
-        if self.game.check_win(-1):
-            messagebox.showinfo("Resultado", "IA venceu!")
-            self.restart_game()
-        elif len(self.game.available_actions()) == 0:
-            messagebox.showinfo("Resultado", "Empate!")
-            self.restart_game()
-
-    def restart_game(self):
-        self.game.reset()
-        for btn in self.buttons:
-            btn.config(text="")
 
     def run(self):
         self.root.mainloop()
 
 
+def main():
+    # Carregar o agente treinado
+    trained_agent = QLearningAgent(2, False)
+    trained_agent.load("./agents/dql/difficult/hard_agent.pickle")
+
+    # Crie um objeto TicTacToeGUI com o agente treinado
+    app = TicTacToeGUI(trained_agent)
+
+    # Execute o jogo
+    app.run()
+
 if __name__ == "__main__":
-    gui_game = TicTacToeGUI()
-    gui_game.run()
+    main()
