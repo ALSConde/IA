@@ -26,7 +26,7 @@ class GymTTT:
             timeStep = self.env.reset()
             policyStep = self.agent.action(timeStep)
             timeStep = self.env.step(policyStep.action)
-            timeStep = timeStep._replace(reward=timeStep.reward * -1)  # type: ignore # invert reward
+            timeStep = timeStep._replace(reward=timeStep.reward * -1)  # invert reward
 
             self.print_message("\n********GYM STARTS********")
             self.print_message("GYM Agent Move: " + str(policyStep.action[:2]))
@@ -59,13 +59,13 @@ class GymTTT:
             policyStep = self.agent.action(timeStep)
             timeStep = self.env.step(policyStep.action)
             timeStep = timeStep._replace(
-                reward=timeStep.reward * -1 # type: ignore
+                reward=timeStep.reward * -1
             )  # invert agent's reward for player
 
             self.print_message("GYM Agent Move: " + str(policyStep.action[:2]))
             self.fancy_display(timeStep.observation)
 
-            if bool(timeStep.is_last()):
+            if timeStep.is_last():
                 if timeStep.reward == 0:
                     self.print_message("***Game Over: Draw***")
                 else:

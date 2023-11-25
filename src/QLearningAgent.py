@@ -1,8 +1,9 @@
 import pickle
 import collections
-import tf_agents
 import random
 import numpy as np
+import tf_agents
+
 
 class QLearningAgent:
     def __init__(
@@ -100,7 +101,7 @@ class QLearningAgent:
         while (
             qsa and max(qsa.values()) >= 0
         ):  # choose from the existing options only if it has a non -ve value
-            act = max(qsa, key=qsa.get) # type: ignore
+            act = max(qsa, key=qsa.get)  # type: ignore
             if board[tuple(act)] == 0:
                 break
             qsa.pop(act, None)
@@ -149,4 +150,3 @@ class QLearningAgent:
         except Exception as e:
             print(f"Error loading agent: {e}")
             return None
-

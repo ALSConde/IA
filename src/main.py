@@ -6,6 +6,7 @@ from numpy import save
 import tensorflow as tf
 
 from DPMinMaxAgent import DPMinMaxAgent
+from MinMaxAgent import MinMaxAgent
 from RandomTTTAgent import RandomTTTAgent
 from GymTTT import GymTTT
 from QLearningAgent import QLearningAgent
@@ -52,7 +53,7 @@ def main():
     gym = GymTTT(gymAgent, False)
 
     start = time.time()
-    games = 100  # episodes
+    games = 5000  # episodes
     for i in range(games):
         timeStep = gym.reset()
         random_action_count = 0
@@ -116,8 +117,8 @@ def main():
     plt.show()
 
     # save the agent
-    # save_path = "./agents/dql/difficult/hard_agent.pickle"
-    # TestAgent.save_agent(file_path=save_path)
+    save_path = "./agents/dql/difficult/hard_agent.pickle"
+    TestAgent.save_agent(file_path=save_path)
 
 if __name__ == "__main__":
     main()

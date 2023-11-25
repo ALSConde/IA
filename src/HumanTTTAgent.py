@@ -7,7 +7,7 @@ class HumanTTTAgent:
         self.verbose = verbose
         self.trainable = False
 
-    def action(self, timeStep):
+    def action(self, timeStep, action = None):
         board = timeStep.observation
 
         empty_slots = []
@@ -19,7 +19,10 @@ class HumanTTTAgent:
         print(board)
         print("input space separated indices; choose from the empty slots")
         print("EmptySlots: ", empty_slots)
-        i, j = self.get_inputs()
+        if action is None:
+            i, j = self.get_inputs()
+        else:
+            i, j = action
         tries = 2
         while [i, j] not in empty_slots and tries:
             print("invalid choice, input space seperated indices, tries left: ", tries)
