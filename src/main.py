@@ -117,7 +117,7 @@ def main():
     plt.show()
 
     # save the agent
-    save_path = "./agents/dql/difficult/hard_agent.pickle"
+    save_path = "./agents/dql/difficult/easy_agent.pickle"
     TestAgent.save_agent(file_path=save_path)
 
 if __name__ == "__main__":

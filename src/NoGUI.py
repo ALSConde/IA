@@ -1,31 +1,38 @@
 from GymTTT import GymTTT
 from QLearningAgent import QLearningAgent
 from HumanTTTAgent import HumanTTTAgent
+from MinMaxAgent import MinMaxAgent
 
 # Create an instance of QLearningAgent
-agent = QLearningAgent(symbol=1, trainable=False).load("./agents/dql/difficult/hard_agent.pickle")
-player = HumanTTTAgent(symbol=2)
+agent = QLearningAgent(1, False).load("./agents/dql/difficult/hard_agent.pickle")
+player = MinMaxAgent(symbol=2)
 
 # Create an instance of GymTTT with the QLearningAgent
 gym = GymTTT(agent, verbose=True)
 
-# Reset the game to initialize it
-timeStep = gym.reset()
-
+draw = 0.0
+win = 0.0
+lose = 0.0
+games = 100
 # Game loop
-while not timeStep.is_last():
-    # Player's move
-    # print("Enter your move:")
-    action = player.action(timeStep).action
-    timeStep = gym.step(action)
+for i in range(0, games):
+    # Reset the game to initialize it
+    timeStep = gym.reset()
+    while not bool(timeStep.is_last()):
+        # Player's move
+        action = player.action(timeStep).action
+        timeStep = gym.step(action)
+        
+        if bool(timeStep.is_last()):
+            # Display the final result
+            if timeStep.reward == 0:
+                draw += 1
+            elif timeStep.reward == -1:
+                win += 1
+            else:
+                lose += 1
+            break
 
-    if timeStep.is_last():
-        break
-
-# Display the final result
-if timeStep.reward == 0:
-    print("Game Over: Draw")
-elif timeStep.reward == -1:
-    print("Invalid move: Gym Agent Wins")
-else:
-    print("Yay!: Test Agent Wins")
+print(f"Draw ratio: {draw/games}")
+print(f"Win ratio: {win/games}")
+print(f"Lose ratio: {lose/games}")

@@ -40,8 +40,8 @@ class GymTTT:
     def step(self, action):
         # player's move
         timeStep = self.env.step(action)
-        self.print_message("Player Move: " + str(action[:2]))
-        self.fancy_display(timeStep.observation)
+        # self.print_message("Player Move: " + str(action[:2]))
+        # self.fancy_display(timeStep.observation)
 
         # if player's move was last
         if bool(timeStep.is_last()):
@@ -62,8 +62,8 @@ class GymTTT:
                 reward=timeStep.reward * -1
             )  # invert agent's reward for player
 
-            self.print_message("GYM Agent Move: " + str(policyStep.action[:2]))
-            self.fancy_display(timeStep.observation)
+            # self.print_message("GYM Agent Move: " + str(policyStep.action[:2]))
+            # self.fancy_display(timeStep.observation)
 
             if timeStep.is_last():
                 if timeStep.reward == 0:

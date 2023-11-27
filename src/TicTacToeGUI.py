@@ -58,10 +58,10 @@ def main():
     # Carregar o agente treinado
     # trained_agent = RandomTTTAgent(1)
     # trained_agent = DPMinMaxAgent(1)
+    # trained_agent = QLearningAgent(1, False)
     # trained_agent = QLearningAgent(1, False).load("./agents/dql/difficult/easy_agent.pickle")
     # trained_agent = QLearningAgent(1, False).load("./agents/dql/difficult/normal_agent.pickle")
-    trained_agent = QLearningAgent(1, False).load("./agents/dql/difficult/hard_agent.pickle")
-
+    # trained_agent = QLearningAgent(1, False).load("./agents/dql/difficult/hard_agent.pickle")
 
     # Crie um objeto TicTacToeGUI com o agente treinado
     app = TicTacToeGUI(trained_agent)
